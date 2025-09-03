@@ -44,6 +44,23 @@ def main():
             st.subheader("📅 Plan")
             st.dataframe(plan, use_container_width=True)
 
+            # Agregar botón de descarga en el sidebar
+            st.sidebar.markdown("---")  # Separador
+            # Convertir el dataframe a Excel y crear el botón de descarga
+            excel_buffer = pd.ExcelWriter('plan.xlsx', engine='xlsxwriter')
+            plan.to_excel(excel_buffer, sheet_name='Plan', index=True)
+            excel_buffer.close()
+            
+            with open('plan.xlsx', 'rb') as f:
+                bytes_data = f.read()
+            st.sidebar.download_button(
+                label="📥 Descargar Plan en Excel",
+                data=bytes_data,
+                file_name=f"plan_inserciones_{start_date.strftime('%d%m%Y')}_{end_date.strftime('%d%m%Y')}.xlsx",
+                mime="application/vnd.ms-excel",
+                help="Descargar el plan de inserciones en formato Excel"
+            )
+
             # Preparar dataset para gráfico único
             from modules.data_utils import preparar_dataset_grafico
             import plotly.express as px
